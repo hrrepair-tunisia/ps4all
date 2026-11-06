@@ -1,0 +1,118 @@
+/* HR Repair Tunisia — presentation layer only */
+* { box-sizing: border-box; }
+html { min-height: 100%; background: #030812; }
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: clamp(18px, 4vw, 52px) 18px 24px;
+  color: #f4f9ff;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(1,7,18,.70), rgba(1,7,18,.88)),
+    url("img.jpg") center center / cover fixed no-repeat,
+    #030812;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.brand-header {
+  width: min(100%, 980px);
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 14px 22px;
+  border: 1px solid rgba(34,160,255,.58);
+  border-radius: 18px;
+  background: linear-gradient(115deg, rgba(3,16,38,.94), rgba(4,39,78,.76));
+  box-shadow: 0 0 28px rgba(0,133,255,.24), inset 0 0 22px rgba(0,115,255,.08);
+}
+.brand-logo { width: 92px; height: 92px; object-fit: contain; border-radius: 12px; }
+.brand-copy { text-align: left; }
+.brand-name { color: #36b8ff; font-size: clamp(22px, 4vw, 36px); font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 16px rgba(0,145,255,.6); }
+.brand-subtitle { margin-top: 7px; color: #d9eaff; font-size: clamp(11px, 1.8vw, 15px); letter-spacing: 2.5px; font-weight: 700; }
+#msgs {
+  width: min(100%, 900px);
+  min-height: 150px;
+  margin: clamp(38px, 8vh, 90px) auto 0 !important;
+  padding: 34px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(35,166,255,.8);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(2,13,31,.94), rgba(4,35,69,.88));
+  box-shadow: 0 0 34px rgba(0,133,255,.22), inset 0 0 22px rgba(0,120,255,.08);
+  color: #f5fbff;
+  font-size: clamp(20px, 3vw, 30px) !important;
+  line-height: 1.35;
+  text-shadow: 0 0 12px rgba(38,163,255,.3);
+  overflow-wrap: anywhere;
+}
+body > h1:not(#msgs) {
+  width: min(100%, 900px);
+  margin: 28px auto 0 !important;
+  padding: 16px;
+  color: #b9d8f5;
+  font-size: clamp(12px, 1.8vw, 16px) !important;
+  line-height: 1.8;
+  border-top: 1px solid rgba(35,166,255,.3);
+}
+body > h1 a { color: #39baff !important; text-decoration: none; }
+.site-footer {
+  margin-top: auto;
+  padding-top: 38px;
+  color: #83a9ca;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.site-footer span { color: #27aaff; padding: 0 7px; }
+@media (max-width: 520px) {
+  body { padding: 12px 10px 18px; background-attachment: scroll; }
+  .brand-header { gap: 12px; padding: 12px; min-height: 90px; }
+  .brand-logo { width: 70px; height: 70px; }
+  .brand-name { letter-spacing: 1px; }
+  #msgs { min-height: 125px; margin-top: 34px !important; padding: 24px 14px; }
+}
+
+.brand-tagline {
+  margin-top: 9px;
+  color: #f1f7ff;
+  font-size: clamp(10px, 1.45vw, 13px);
+  line-height: 1.5;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.hr-strength {
+  width: min(100%, 900px);
+  margin: 28px auto 0;
+  padding: 20px 16px;
+  border-top: 1px solid rgba(35,166,255,.42);
+  text-align: center;
+}
+.hr-strength-title {
+  color: #39baff;
+  font-size: clamp(20px, 3vw, 29px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 16px rgba(0,145,255,.55);
+}
+.hr-strength-line {
+  margin-top: 8px;
+  color: #eaf6ff;
+  font-size: clamp(13px, 2vw, 18px);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.hr-strength-detail {
+  margin-top: 7px;
+  color: #a9c9e7;
+  font-size: clamp(10px, 1.5vw, 13px);
+  font-weight: 600;
+  letter-spacing: .8px;
+  line-height: 1.5;
+}
