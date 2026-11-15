@@ -464,10 +464,8 @@ function cleanUp() {
   // clear logs
   ui.consoleElement.textContent = '';
   if (ui.initialScreen) {
-    // Keep screen one visible and display a live mirror of the original exploit log.
-    // The original status panel remains in screen two, preserving its controls and DOM references.
-    if (typeof showHRInlineProgress === "function") {
-      showHRInlineProgress();
+    if (typeof showHRStartIndicator === "function") {
+      showHRStartIndicator();
     } else {
       toggleVisibility(ui.initialScreen.id, 0);
     }

@@ -43,102 +43,6 @@ function isHttps() {
     return window.location.protocol === 'https:';
 }
 
-// HR Repair: mirror the real exploit log on screen one without moving or cloning
-// the original status panel. This keeps the existing exploit code and page two intact.
-function syncHRInlineProgress() {
-    var sourceConsole = null;
-    if (typeof ui !== 'undefined' && ui.consoleElement) {
-        sourceConsole = ui.consoleElement;
-    } else {
-        sourceConsole = document.getElementById('console');
-    }
-    var mirrorConsole = document.getElementById('hr-inline-progress-console');
-    if (!sourceConsole || !mirrorConsole) return;
-    mirrorConsole.innerHTML = sourceConsole.innerHTML;
-    mirrorConsole.scrollTop = mirrorConsole.scrollHeight;
-}
-
-function showHRInlineProgress() {
-    var screen = (typeof ui !== 'undefined' && ui.initialScreen)
-        ? ui.initialScreen
-        : document.getElementById('initial-screen');
-    if (!screen) return false;
-
-    var host = document.getElementById('hr-inline-progress-host');
-    if (!host) {
-        host = document.createElement('section');
-        host.id = 'hr-inline-progress-host';
-
-        var headingRow = document.createElement('div');
-        headingRow.className = 'hr-inline-progress-heading';
-
-        var heading = document.createElement('h2');
-        heading.id = 'hr-inline-progress-title';
-        var originalHeading = document.getElementById('state');
-        heading.textContent = originalHeading ? originalHeading.textContent : 'Exploit status';
-
-        var liveLabel = document.createElement('span');
-        liveLabel.className = 'hr-inline-progress-live';
-        liveLabel.textContent = 'LIVE';
-        headingRow.appendChild(heading);
-        headingRow.appendChild(liveLabel);
-
-        var consoleBox = document.createElement('div');
-        consoleBox.id = 'hr-inline-progress-console-box';
-        consoleBox.dir = 'ltr';
-
-        var mirror = document.createElement('pre');
-        mirror.id = 'hr-inline-progress-console';
-        mirror.textContent = 'Preparing exploit...';
-        consoleBox.appendChild(mirror);
-        host.appendChild(headingRow);
-        host.appendChild(consoleBox);
-
-        var chooseBox = document.getElementById('choosejb-initial');
-        if (chooseBox && chooseBox.parentNode === screen && chooseBox.nextSibling) {
-            screen.insertBefore(host, chooseBox.nextSibling);
-        } else if (chooseBox && chooseBox.parentNode === screen) {
-            screen.appendChild(host);
-        } else {
-            screen.appendChild(host);
-        }
-    }
-
-    screen.classList.remove('hidden');
-    screen.classList.add('hr-progress-active');
-    screen.style.removeProperty('display');
-
-    // Hide only the start controls; keep the HR Repair header and first page visible.
-    var idsToHide = [
-        'pslogo', 'click-to-start-text', 'stopAutoJb', 'PS4FW',
-        'choosejb-initial', 'scrollDown'
-    ];
-    for (var i = 0; i < idsToHide.length; i++) {
-        var element = document.getElementById(idsToHide[i]);
-        if (element) {
-            element.classList.add('hidden');
-            element.style.setProperty('display', 'none', 'important');
-        }
-    }
-
-    var source = (typeof ui !== 'undefined' && ui.consoleElement)
-        ? ui.consoleElement
-        : document.getElementById('console');
-    var target = document.getElementById('hr-inline-progress-console');
-    if (source && target) {
-        target.innerHTML = source.innerHTML || '<span>Preparing exploit...</span>';
-        target.scrollTop = target.scrollHeight;
-    }
-
-    // Keep the first screen in view when Start was triggered from a different section.
-    if (typeof ui !== 'undefined' && ui.mainContainer) {
-        ui.mainContainer.scrollTop = 0;
-    }
-    if (typeof lastScrollY !== 'undefined') lastScrollY = 0;
-    if (typeof lastSection !== 'undefined') lastSection = 'initial';
-    return true;
-}
-
 // Works in both index.html and exploit.html
 function log(message, color, consoleEl) {
     var consoleEl = consoleEl ? consoleEl : ui.consoleElement;
@@ -158,7 +62,6 @@ function log(message, color, consoleEl) {
     span.textContent = message + '\n';
     if (color) span.style.color = color;
     consoleEl.appendChild(span);
-    if (typeof syncHRInlineProgress === 'function') syncHRInlineProgress();
 }
 
 function getReloadAfterJbValue() {
@@ -198,6 +101,93 @@ function updateJbStats(attempt, isSuccess, revert) {
     }
 }
 
+
+
+// HR Repair start indicator: show a real spinner while the exploit runs,
+// then replace it with DONE only when an exploit implementation reports success.
+function showHRStartIndicator() {
+    var screen = document.getElementById('initial-screen');
+    if (!screen) return false;
+
+    var startButton = document.getElementById('pslogo');
+    var indicator = document.getElementById('hr-start-indicator');
+
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'hr-start-indicator';
+        indicator.className = 'hr-start-indicator';
+        indicator.setAttribute('role', 'status');
+        indicator.setAttribute('aria-live', 'polite');
+        indicator.setAttribute('aria-busy', 'true');
+
+        var spinner = document.createElement('div');
+        spinner.id = 'hr-start-indicator-spinner';
+        spinner.className = 'hr-start-indicator-spinner';
+        spinner.setAttribute('aria-hidden', 'true');
+
+        var mainText = document.createElement('div');
+        mainText.id = 'hr-start-indicator-main';
+        mainText.className = 'hr-start-indicator-main';
+        mainText.textContent = 'PROCESSING...';
+
+        var arabicText = document.createElement('div');
+        arabicText.id = 'hr-start-indicator-arabic';
+        arabicText.className = 'hr-start-indicator-arabic';
+        arabicText.setAttribute('dir', 'rtl');
+        arabicText.setAttribute('lang', 'ar');
+        arabicText.textContent = 'جارٍ تنفيذ العملية...';
+
+        indicator.appendChild(spinner);
+        indicator.appendChild(mainText);
+        indicator.appendChild(arabicText);
+
+        if (startButton && startButton.parentNode) {
+            startButton.parentNode.insertBefore(indicator, startButton.nextSibling);
+        } else {
+            screen.appendChild(indicator);
+        }
+    }
+
+    screen.classList.remove('hidden');
+    screen.style.removeProperty('display');
+    screen.classList.add('hr-starting');
+
+    if (startButton) startButton.style.setProperty('display', 'none', 'important');
+
+    // Hide only the initial selection/navigation controls while the indicator runs.
+    var hideIds = ['click-to-start-text', 'choosejb-initial', 'scrollDown'];
+    for (var i = 0; i < hideIds.length; i++) {
+        var el = document.getElementById(hideIds[i]);
+        if (el) el.style.setProperty('display', 'none', 'important');
+    }
+
+    indicator.classList.remove('hr-start-indicator-done');
+    indicator.setAttribute('aria-busy', 'true');
+    var spinnerNode = document.getElementById('hr-start-indicator-spinner');
+    var mainNode = document.getElementById('hr-start-indicator-main');
+    var arabicNode = document.getElementById('hr-start-indicator-arabic');
+    if (spinnerNode) spinnerNode.style.removeProperty('display');
+    if (mainNode) mainNode.textContent = 'PROCESSING...';
+    if (arabicNode) arabicNode.textContent = 'جارٍ تنفيذ العملية...';
+    return true;
+}
+
+function completeHRStartIndicator() {
+    var indicator = document.getElementById('hr-start-indicator');
+    if (!indicator) return false;
+
+    var spinner = document.getElementById('hr-start-indicator-spinner');
+    var mainText = document.getElementById('hr-start-indicator-main');
+    var arabicText = document.getElementById('hr-start-indicator-arabic');
+    if (spinner) spinner.style.setProperty('display', 'none', 'important');
+    if (mainText) mainText.textContent = 'DONE';
+    if (arabicText) arabicText.textContent = 'تمت العملية بنجاح';
+
+    indicator.classList.add('hr-start-indicator-done');
+    indicator.setAttribute('aria-busy', 'false');
+    return true;
+}
+
 // Called by exploit implementations after a successful jailbreak.
 function jailbreakSuccess(statusMessage) {
     var isBinLoader = storage.session.getBoolean('binloader', false);
@@ -209,6 +199,10 @@ function jailbreakSuccess(statusMessage) {
     storage.session.remove('binloader');
 
     updateJbStats(0, 1);
+
+    if (typeof completeHRStartIndicator === "function") {
+        completeHRStartIndicator();
+    }
 
     if (getReloadAfterJbValue() && !isBinLoader) {
         setTimeout(function () { window.location.href = mainPage; }, 5000);
