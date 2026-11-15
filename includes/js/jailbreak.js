@@ -245,7 +245,13 @@ function cleanUp() {
   ui.consoleElement.textContent = '';
 
   if (ui.initialScreen) {
-    toggleVisibility(ui.initialScreen.id, 0);
+    // Keep screen one visible and display a live mirror of the original exploit log.
+    // The original status panel remains in screen two, preserving its controls and DOM references.
+    if (typeof showHRInlineProgress === "function") {
+      showHRInlineProgress();
+    } else {
+      toggleVisibility(ui.initialScreen.id, 0);
+    }
   }
 
   // if RTL language, keep text from left to right
